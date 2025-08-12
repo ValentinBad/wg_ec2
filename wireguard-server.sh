@@ -87,7 +87,7 @@ function checkOS() {
 			apk update && apk add virt-what
 		fi
 	else
-		echo "Looks like you aren't running this installer on a Debian, Ubuntu, Fedora, CentOS, AlmaLinux, Oracle or Arch Linux system"
+		echo "Looks like you aren't running this installer on a Debian, Ubuntu, Fedora, Amazon Linux 2023, CentOS, AlmaLinux, Oracle or Arch Linux system"
 		exit 1
 	fi
 }
@@ -192,8 +192,26 @@ function installQuestions() {
 }
 
 function installWireGuard() {
-	# Run setup questions first
-	installQuestions
+
+	if [[ $AUTO_INSTALL == "y" ]]; then
+		# Set default choices so that no questions will be asked.
+		SERVER_PUB_IP=$(curl -s ifconfig.me)
+		SERVER_PUB_NIC=$(ip -4 route ls | grep default | awk '/dev/ {for (i=1; i<=NF; i++) if ($i == "dev") print $(i+1)}' | head -1)
+		SERVER_WG_NIC="wg0"
+		SERVER_WG_IPV4="10.66.66.1"
+		SERVER_WG_IPV6="fd42:42:42::1"
+		SERVER_PORT="51820"
+		CLIENT_DNS_1="1.1.1.1"
+		CLIENT_DNS_2="1.0.0.1"
+		ALLOWED_IPS="0.0.0.0/0,::/0"
+		
+	fi
+	else
+		# Run setup questions first
+		installQuestions
+	fi
+
+
 
 	# Install WireGuard tools and module
 	if [[ ${OS} == 'ubuntu' ]] || [[ ${OS} == 'debian' && ${VERSION_ID} -gt 10 ]]; then
@@ -586,10 +604,11 @@ function manageMenu() {
 }
 
 # Check for root, virt, OS...
+AUTO_INSTALL='y'
 initialCheck
 
 # Check if WireGuard is already installed and load params
-if [[ -e /etc/wireguard/params ]]; then
+if [[ -e /etc/wireguard/params && $AUTO_INSTALL != "y" ]]; then
 	source /etc/wireguard/params
 	manageMenu
 else

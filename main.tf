@@ -85,7 +85,13 @@ resource "aws_instance" "wg" {
   associate_public_ip_address = true
 
   # user_data will read the local file wireguard-server.sh (save it next to main.tf)
-  user_data = file("${path.module}/wireguard-server.sh")
+  user_data = <<EOF
+#!/bin/bash
+curl -o /tmp/wireguard-server.sh https://raw.githubusercontent.com/ValentinBad/wg_ec2/main/wireguard-server.sh
+chmod +x /tmp/wireguard-server.sh
+/tmp/wireguard-server.sh
+EOF
+
 
   tags = {
     Name = "wireguard-server"

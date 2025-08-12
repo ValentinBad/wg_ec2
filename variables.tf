@@ -11,13 +11,13 @@ variable "aws_region" {
 variable "key_name" {
   description = "Name for the EC2 key pair to create"
   type        = string
-  default     = "my-aws-wg"
+  default     = "my-aws-wg-key"
 }
 
 variable "public_key_path" {
   description = "Path to the public key file (e.g. ~/.ssh/id_rsa.pub)"
   type        = string
-  default     = "/home/valentin/my-aws-wg.pub"
+  default     = "/home/valentin/my-aws-wg/my-aws-wg-key.pub"
 }
 
 variable "instance_type" {
