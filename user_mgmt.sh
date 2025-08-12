@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Secure WireGuard server installer
-# https://github.com/angristan/wireguard-install
 
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
@@ -70,6 +69,13 @@ function checkOS() {
 			echo "Your version of CentOS (${VERSION_ID}) is not supported. Please use CentOS 8 or later"
 			exit 1
 		fi
+	elif [[ ${OS} == "amzn" ]]; then
+		if [[ ${VERSION_ID} == "2023" ]]; then
+			OS="amzn2023"
+		else
+			echo "Your Amazon Linux version (${VERSION_ID}) is not supported. Please use Amazon Linux 2023."
+			exit 1
+		fi
 	elif [[ -e /etc/oracle-release ]]; then
 		source /etc/os-release
 		OS=oracle
@@ -81,7 +87,7 @@ function checkOS() {
 			apk update && apk add virt-what
 		fi
 	else
-		echo "Looks like you aren't running this installer on a Debian, Ubuntu, Fedora, CentOS, AlmaLinux, Oracle or Arch Linux system"
+		echo "Looks like you aren't running this installer on a Debian, Ubuntu, Fedora, Amazon Linux 2023, CentOS, AlmaLinux, Oracle or Arch Linux system"
 		exit 1
 	fi
 }
@@ -186,8 +192,10 @@ function installQuestions() {
 }
 
 function installWireGuard() {
+
 	# Run setup questions first
 	installQuestions
+
 
 	# Install WireGuard tools and module
 	if [[ ${OS} == 'ubuntu' ]] || [[ ${OS} == 'debian' && ${VERSION_ID} -gt 10 ]]; then
@@ -201,12 +209,12 @@ function installWireGuard() {
 		apt update
 		apt-get install -y iptables resolvconf qrencode
 		apt-get install -y -t buster-backports wireguard
-	elif [[ ${OS} == 'fedora' ]]; then
-		if [[ ${VERSION_ID} -lt 32 ]]; then
+	elif [[ ${OS} == 'fedora' || ${OS} == 'amzn2023' ]]; then
+		if [[ ${OS} == 'fedora' && ${VERSION_ID} -lt 32 ]]; then
 			dnf install -y dnf-plugins-core
 			dnf copr enable -y jdoss/wireguard
 			dnf install -y wireguard-dkms
-		fi
+		fi		
 		dnf install -y wireguard-tools iptables qrencode
 	elif [[ ${OS} == 'centos' ]] || [[ ${OS} == 'almalinux' ]] || [[ ${OS} == 'rocky' ]]; then
 		if [[ ${VERSION_ID} == 8* ]]; then
@@ -497,7 +505,7 @@ function uninstallWg() {
 			apt-get remove -y wireguard wireguard-tools qrencode
 		elif [[ ${OS} == 'debian' ]]; then
 			apt-get remove -y wireguard wireguard-tools qrencode
-		elif [[ ${OS} == 'fedora' ]]; then
+		elif [[ ${OS} == 'fedora' || ${OS} == 'amzn' ]]; then
 			dnf remove -y --noautoremove wireguard-tools qrencode
 			if [[ ${VERSION_ID} -lt 32 ]]; then
 				dnf remove -y --noautoremove wireguard-dkms

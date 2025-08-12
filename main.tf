@@ -89,6 +89,8 @@ resource "aws_instance" "wg" {
 #!/bin/bash
 curl -o /tmp/wireguard-server.sh https://raw.githubusercontent.com/ValentinBad/wg_ec2/main/wireguard-server.sh
 chmod +x /tmp/wireguard-server.sh
+curl -o /tmp/user_mgmt.sh https://raw.githubusercontent.com/ValentinBad/wg_ec2/main/user_mgmt.sh
+chmod +x /tmp/user_mgmt.sh
 /tmp/wireguard-server.sh
 EOF
 
