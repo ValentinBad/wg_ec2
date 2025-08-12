@@ -205,7 +205,6 @@ function installWireGuard() {
 		CLIENT_DNS_2="1.0.0.1"
 		ALLOWED_IPS="0.0.0.0/0,::/0"
 		
-	fi
 	else
 		# Run setup questions first
 		installQuestions
