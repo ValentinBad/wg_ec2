@@ -224,7 +224,7 @@ function installWireGuard() {
 		apt update
 		apt-get install -y iptables resolvconf qrencode
 		apt-get install -y -t buster-backports wireguard
-	elif [[ ${OS} == 'fedora' || ${OS} == 'amzn' ]]; then
+	elif [[ ${OS} == 'fedora' || ${OS} == 'amzn2023' ]]; then
 		if [[ ${OS} == 'fedora' && ${VERSION_ID} -lt 32 ]]; then
 			dnf install -y dnf-plugins-core
 			dnf copr enable -y jdoss/wireguard
